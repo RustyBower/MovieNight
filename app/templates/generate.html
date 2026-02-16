@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Pick Movies - Movie Night{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto w-full px-4 py-8 flex flex-col flex-1">
+    <!-- Filter form — loaded via HTMX -->
+    <section id="filter-section"
+             hx-get="/api/filters"
+             hx-trigger="load"
+             hx-swap="innerHTML"
+             class="mb-8">
+        <div class="flex items-center gap-3 text-zinc-500">
+            <div class="w-5 h-5 border-2 border-zinc-600 border-t-transparent
+                        rounded-full animate-spin"></div>
+            Loading filters...
+        </div>
+    </section>
+
+    <!-- Movie results -->
+    <section id="movie-results" class="flex-1">
+        <div class="flex items-center justify-center h-48 text-zinc-600 text-lg">
+            Pick your filters and hit <span class="text-amber-400 font-semibold ml-1">Roll the Dice</span>
+        </div>
+    </section>
+</div>
+{% endblock %}

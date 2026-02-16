@@ -1,0 +1,50 @@
+{% if movies %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+    {% for m in movies %}
+    <div class="movie-card group relative rounded-xl overflow-hidden bg-zinc-900
+                shadow-lg shadow-black/40 aspect-[2/3]">
+        {% if m.has_thumb %}
+        <img src="/api/poster/{{ m.rating_key }}"
+             alt="{{ m.title }}"
+             loading="lazy"
+             class="w-full h-full object-cover">
+        {% else %}
+        <div class="w-full h-full flex items-center justify-center bg-zinc-800">
+            <span class="text-zinc-600 text-6xl font-bold">?</span>
+        </div>
+        {% endif %}
+
+        <!-- Hover overlay -->
+        <div class="movie-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                    flex flex-col justify-end p-5">
+            <h3 class="text-xl font-bold text-white mb-1">{{ m.title }}</h3>
+            <div class="flex items-center gap-2 text-sm text-zinc-300 mb-2 flex-wrap">
+                {% if m.year %}<span>{{ m.year }}</span>{% endif %}
+                {% if m.content_rating %}
+                <span class="px-1.5 py-0.5 rounded bg-zinc-700 text-xs">{{ m.content_rating }}</span>
+                {% endif %}
+                {% if m.duration_minutes %}<span>{{ m.duration_minutes }} min</span>{% endif %}
+                {% if m.audience_rating %}
+                <span class="text-amber-400 font-semibold">{{ m.audience_rating }}</span>
+                {% endif %}
+            </div>
+            {% if m.genres %}
+            <div class="flex flex-wrap gap-1 mb-3">
+                {% for g in m.genres[:4] %}
+                <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs">{{ g }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if m.summary %}
+            <p class="text-xs text-zinc-400 line-clamp-4 leading-relaxed">{{ m.summary }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="flex items-center justify-center h-48 text-zinc-500 text-lg">
+    No movies matched your filters. Try broadening your search.
+</div>
+{% endif %}

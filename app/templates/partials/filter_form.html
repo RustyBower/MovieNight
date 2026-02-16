@@ -1,0 +1,100 @@
+<form hx-post="/api/generate"
+      hx-target="#movie-results"
+      hx-swap="innerHTML"
+      hx-indicator="#spin"
+      class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
+
+    <!-- Source -->
+    <div class="col-span-2 sm:col-span-3 lg:col-span-6">
+        <label class="block text-sm font-medium text-zinc-400 mb-1">Source</label>
+        <select name="playlist_key"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
+                       text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="">Full Library</option>
+            {% for pl in playlists %}
+            <option value="{{ pl.ratingKey }}">{{ pl.title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Genre -->
+    <div>
+        <label class="block text-sm font-medium text-zinc-400 mb-1">Genre</label>
+        <select name="genre"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
+                       text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="">Any</option>
+            {% for g in genres %}
+            <option value="{{ g }}">{{ g }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Content Rating -->
+    <div>
+        <label class="block text-sm font-medium text-zinc-400 mb-1">Rating</label>
+        <select name="content_rating"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
+                       text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="">Any</option>
+            {% for r in content_ratings %}
+            <option value="{{ r }}">{{ r }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Decade -->
+    <div>
+        <label class="block text-sm font-medium text-zinc-400 mb-1">Decade</label>
+        <select name="decade"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
+                       text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="">Any</option>
+            {% for d in decades %}
+            <option value="{{ d }}">{{ d }}s</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Min Audience Rating -->
+    <div>
+        <label class="block text-sm font-medium text-zinc-400 mb-1">Min Score</label>
+        <select name="min_rating"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
+                       text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="0">Any</option>
+            <option value="5">5+</option>
+            <option value="6">6+</option>
+            <option value="7">7+</option>
+            <option value="8">8+</option>
+            <option value="9">9+</option>
+        </select>
+    </div>
+
+    <!-- Count -->
+    <div>
+        <label class="block text-sm font-medium text-zinc-400 mb-1">Movies</label>
+        <select name="count"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
+                       text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+        </select>
+    </div>
+
+    <!-- Submit -->
+    <div class="col-span-2 sm:col-span-3 lg:col-span-1">
+        <button type="submit"
+                class="w-full bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold
+                       py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+            <span id="spin" class="htmx-indicator">
+                <span class="inline-block w-4 h-4 border-2 border-zinc-950 border-t-transparent
+                             rounded-full animate-spin"></span>
+            </span>
+            Roll the Dice
+        </button>
+    </div>
+</form>

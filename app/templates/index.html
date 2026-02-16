@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex-1 flex items-center justify-center px-4">
+    <div class="text-center max-w-md">
+        <h1 class="text-5xl font-extrabold text-amber-400 mb-2">Movie Night</h1>
+        <p class="text-zinc-400 mb-10 text-lg">
+            Can't decide what to watch? Let your Plex library pick for you.
+        </p>
+        <a href="/auth/login"
+           class="inline-flex items-center gap-3 bg-amber-500 hover:bg-amber-400
+                  text-zinc-950 font-semibold px-8 py-3 rounded-lg text-lg
+                  transition-colors shadow-lg shadow-amber-500/20">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 22h20L12 2zm0 5l6.5 13h-13L12 7z"/>
+            </svg>
+            Sign in with Plex
+        </a>
+    </div>
+</div>
+{% endblock %}

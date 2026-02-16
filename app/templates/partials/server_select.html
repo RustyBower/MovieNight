@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Select Server - Movie Night{% endblock %}
+
+{% block content %}
+<div class="flex-1 flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-lg">
+        <h2 class="text-2xl font-bold text-center mb-2">Pick a Plex Server</h2>
+        <p class="text-zinc-500 text-sm text-center mb-6">Choose the connection URL that's reachable from this machine.</p>
+        <form action="/auth/select-server" method="post" class="space-y-5">
+            {% set ns = namespace(first=true) %}
+            {% for s in servers %}
+            <fieldset class="rounded-lg bg-zinc-900 border border-zinc-800 p-4">
+                <legend class="text-lg font-semibold text-zinc-200 px-1">{{ s.name }}</legend>
+                <div class="space-y-2 mt-2">
+                    {% for u in s.urls %}
+                    <label class="flex items-center gap-3 px-3 py-2 rounded-md
+                                  hover:bg-zinc-800 cursor-pointer transition-colors">
+                        <input type="radio" name="server_url" value="{{ u.uri }}"
+                               class="accent-amber-500"
+                               {% if ns.first %}checked{% set ns.first = false %}{% endif %}>
+                        <span class="text-sm font-mono text-zinc-300 break-all">{{ u.uri }}</span>
+                        <span class="ml-auto shrink-0 text-xs px-2 py-0.5 rounded-full
+                                     {% if u.label == 'local' %}bg-green-500/20 text-green-400{% else %}bg-blue-500/20 text-blue-400{% endif %}">
+                            {{ u.label }}
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+            {% endfor %}
+            <button type="submit"
+                    class="w-full bg-amber-500 hover:bg-amber-400 text-zinc-950
+                           font-bold py-3 rounded-lg transition-colors">
+                Connect
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

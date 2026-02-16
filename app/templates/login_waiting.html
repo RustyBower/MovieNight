@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Signing in... - Movie Night{% endblock %}
+
+{% block content %}
+<div class="flex-1 flex items-center justify-center px-4">
+    <div class="text-center">
+        <div class="mb-6">
+            <div class="inline-block w-12 h-12 border-4 border-amber-400 border-t-transparent
+                        rounded-full animate-spin"></div>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">Waiting for Plex</h2>
+        <div id="poll-status"
+             hx-get="/auth/poll"
+             hx-trigger="load, every 2s"
+             hx-swap="innerHTML">
+            <p class="text-zinc-400">Complete the sign-in in the Plex window...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
