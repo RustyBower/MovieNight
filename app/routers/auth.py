@@ -148,6 +148,7 @@ async def servers(request: Request):
     if servers and not force_pick:
         best = _pick_best_url(servers[0]["urls"])
         session["server_url"] = best
+        session["server_name"] = servers[0]["name"]
         return RedirectResponse("/generate", status_code=302)
 
     return templates.TemplateResponse(
@@ -164,6 +165,7 @@ async def select_server(request: Request):
         return RedirectResponse("/auth/servers", status_code=302)
 
     request.state.session["server_url"] = server_url
+    request.state.session["server_name"] = form.get("server_name", "")
     # Clear cached PlexServer so it reconnects to the new one
     request.state.session.pop("_plex_server", None)
     return RedirectResponse("/generate", status_code=302)

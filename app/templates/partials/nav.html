@@ -2,12 +2,22 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <a href="/" class="text-xl font-bold text-amber-400 tracking-tight">Movie Night</a>
         {% if request.state.session.get("plex_token") %}
-        <form action="/auth/logout" method="post">
-            <button type="submit"
-                    class="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">
-                Sign out
-            </button>
-        </form>
+        <div class="flex items-center gap-4">
+            {% if request.state.session.get("server_name") %}
+            <a href="/auth/servers?pick=1"
+               class="text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
+               title="Change server">
+                <span class="text-zinc-500">Server:</span>
+                {{ request.state.session.get("server_name") }}
+            </a>
+            {% endif %}
+            <form action="/auth/logout" method="post">
+                <button type="submit"
+                        class="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">
+                    Sign out
+                </button>
+            </form>
+        </div>
         {% endif %}
     </div>
 </nav>
