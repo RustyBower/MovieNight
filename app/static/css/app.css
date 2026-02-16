@@ -35,6 +35,12 @@
     display: inline-block;
 }
 
+/* Disable button during request */
+.htmx-request button[type="submit"] {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 /* Touch: always show overlay on mobile */
 @media (hover: none) {
     .movie-overlay {

@@ -34,7 +34,8 @@ async def generate(request: Request, plex: PlexServer = Depends(require_auth)):
         playlist_key=form.get("playlist_key", ""),
     )
     return templates.TemplateResponse(
-        "partials/movie_cards.html", {"request": request, "movies": movies}
+        "partials/movie_cards.html",
+        {"request": request, "movies": movies, "server_machine_id": plex.machineIdentifier},
     )
 
 

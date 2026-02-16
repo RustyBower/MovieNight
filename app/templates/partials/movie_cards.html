@@ -1,8 +1,10 @@
 {% if movies %}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
     {% for m in movies %}
-    <div class="movie-card group relative rounded-xl overflow-hidden bg-zinc-900
-                shadow-lg shadow-black/40 aspect-[2/3]">
+    <a href="https://app.plex.tv/desktop#!/server/{{ server_machine_id }}/details?key=%2Flibrary%2Fmetadata%2F{{ m.rating_key }}"
+       target="_blank" rel="noopener"
+       class="movie-card group relative rounded-xl overflow-hidden bg-zinc-900
+              shadow-lg shadow-black/40 aspect-[2/3] block">
         {% if m.has_thumb %}
         <img src="/api/poster/{{ m.rating_key }}"
              alt="{{ m.title }}"
@@ -40,7 +42,7 @@
             <p class="text-xs text-zinc-400 line-clamp-4 leading-relaxed">{{ m.summary }}</p>
             {% endif %}
         </div>
-    </div>
+    </a>
     {% endfor %}
 </div>
 {% else %}

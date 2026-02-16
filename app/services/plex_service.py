@@ -65,14 +65,48 @@ def get_random_movies(
 ) -> list[dict]:
     """Pick random movies matching filters."""
     if playlist_key:
+        # Playlists can't use server-side search, fall back to client-side
         movies = _get_playlist_movies(plex, playlist_key)
-    else:
-        lib = get_movie_library(plex)
-        if not lib:
+        filtered = _apply_filters(movies, genre, content_rating, decade, min_rating)
+        count = min(count, len(filtered))
+        if count == 0:
             return []
-        movies = lib.all()
+        chosen = random.sample(filtered, count)
+        return [_movie_to_dict(m) for m in chosen]
 
-    # Apply filters
+    lib = get_movie_library(plex)
+    if not lib:
+        return []
+
+    # Build server-side filters for Plex to handle
+    kwargs: dict = {}
+    filters: dict = {}
+    if genre:
+        kwargs["genre"] = genre
+    if content_rating:
+        kwargs["contentRating"] = content_rating
+    if decade:
+        kwargs["decade"] = int(decade)
+    if min_rating:
+        filters["audienceRating>>"] = min_rating
+
+    # Let Plex pick random results server-side — avoids fetching the whole library
+    # Request extra to account for possible non-Movie items, then trim
+    results = lib.search(
+        sort="random",
+        maxresults=count * 2,
+        filters=filters if filters else None,
+        **kwargs,
+    )
+
+    chosen = [m for m in results if isinstance(m, Movie)][:count]
+    return [_movie_to_dict(m) for m in chosen]
+
+
+def _apply_filters(
+    movies: list, genre: str, content_rating: str, decade: str, min_rating: float
+) -> list[Movie]:
+    """Client-side filtering for playlist movies."""
     filtered: list[Movie] = []
     for m in movies:
         if not isinstance(m, Movie):
@@ -88,13 +122,7 @@ def get_random_movies(
         if min_rating and (m.audienceRating or 0) < min_rating:
             continue
         filtered.append(m)
-
-    count = min(count, len(filtered))
-    if count == 0:
-        return []
-
-    chosen = random.sample(filtered, count)
-    return [_movie_to_dict(m) for m in chosen]
+    return filtered
 
 
 def _get_playlist_movies(plex: PlexServer, rating_key: str) -> list:
