@@ -12,7 +12,7 @@ COOKIE_NAME = "mn_session"
 MAX_AGE = 60 * 60 * 24 * 7  # 7 days
 
 # Keys that are safe to persist in the cookie (no large objects)
-_PERSIST_KEYS = {"plex_token", "server_url", "pin_id", "pin_code"}
+_PERSIST_KEYS = {"plex_token", "server_url", "server_name", "pin_id", "pin_code"}
 
 _signer = URLSafeSerializer(settings.secret_key, salt="session")
 

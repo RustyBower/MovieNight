@@ -31,11 +31,12 @@ def require_auth(request: Request) -> PlexServer:
 
     log.info("require_auth: connecting to %s", server_url)
     try:
-        # Plex servers often have certs issued for *.plex.direct, not custom domains.
-        # Disable SSL verification for non-plex.direct hosts to avoid cert mismatch.
+        # Plex auto-discovered URLs (*.plex.direct, raw IPs) often have certs
+        # that don't match the hostname. Only disable verification for those.
         http_session = RequestsSession()
         hostname = urlparse(server_url).hostname or ""
-        if not hostname.endswith("plex.direct"):
+        is_ip = hostname.replace(".", "").isdigit() or ":" in hostname
+        if hostname.endswith("plex.direct") or is_ip:
             http_session.verify = False
         plex = PlexServer(server_url, token, session=http_session)
     except Exception as exc:

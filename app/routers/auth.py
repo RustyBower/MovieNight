@@ -151,9 +151,19 @@ async def servers(request: Request):
         session["server_name"] = servers[0]["name"]
         return RedirectResponse("/generate", status_code=302)
 
+    # Check if current server_url is a custom one (not in discovered URLs)
+    current_url = session.get("server_url", "")
+    all_uris = {u["uri"] for s in servers for u in s["urls"]}
+    current_is_custom = current_url and current_url not in all_uris
+
     return templates.TemplateResponse(
         "partials/server_select.html",
-        {"request": request, "servers": servers},
+        {
+            "request": request,
+            "servers": servers,
+            "current_url": current_url,
+            "current_is_custom": current_is_custom,
+        },
     )
 
 
@@ -164,8 +174,15 @@ async def select_server(request: Request):
     if not server_url:
         return RedirectResponse("/auth/servers", status_code=302)
 
+    # Handle custom URL input
+    if server_url == "__custom__":
+        custom_url = form.get("custom_url", "").strip().rstrip("/")
+        if not custom_url:
+            return RedirectResponse("/auth/servers?pick=1", status_code=302)
+        server_url = custom_url
+
     request.state.session["server_url"] = server_url
-    request.state.session["server_name"] = form.get("server_name", "")
+    request.state.session["server_name"] = form.get("server_name", "") or urlparse(server_url).hostname or ""
     # Clear cached PlexServer so it reconnects to the new one
     request.state.session.pop("_plex_server", None)
     return RedirectResponse("/generate", status_code=302)
