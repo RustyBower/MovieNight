@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     plex_app_client_id: str = "movienight-web-app"
     plex_app_name: str = "Movie Night"
     base_url: str = ""  # auto-detected from request if blank
+    default_server_url: str = ""  # used instead of auto-discovery when set
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

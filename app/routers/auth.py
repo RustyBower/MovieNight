@@ -143,13 +143,21 @@ async def servers(request: Request):
             if urls:
                 servers.append({"name": r["name"], "urls": urls})
 
-    # Auto-select: prefer remote URL on standard port (443) → any remote → first local
+    # Auto-select: keep the current choice, else DEFAULT_SERVER_URL, else
+    # prefer remote URL on standard port (443) → any remote → first local
     force_pick = request.query_params.get("pick")
-    if servers and not force_pick:
-        best = _pick_best_url(servers[0]["urls"])
-        session["server_url"] = best
-        session["server_name"] = servers[0]["name"]
-        return RedirectResponse("/generate", status_code=302)
+    if not force_pick:
+        if session.get("server_url"):
+            return RedirectResponse("/generate", status_code=302)
+        if settings.default_server_url:
+            url = settings.default_server_url.rstrip("/")
+            session["server_url"] = url
+            session["server_name"] = urlparse(url).hostname or ""
+            return RedirectResponse("/generate", status_code=302)
+        if servers:
+            session["server_url"] = _pick_best_url(servers[0]["urls"])
+            session["server_name"] = servers[0]["name"]
+            return RedirectResponse("/generate", status_code=302)
 
     # Check if current server_url is a custom one (not in discovered URLs)
     current_url = session.get("server_url", "")
