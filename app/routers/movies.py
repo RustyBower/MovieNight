@@ -17,6 +17,7 @@ templates = Jinja2Templates(directory="app/templates")
 async def filters(request: Request, plex: PlexServer = Depends(require_auth)):
     data = plex_service.get_filters(plex)
     return templates.TemplateResponse(
+        request,
         "partials/filter_form.html", {"request": request, **data}
     )
 
@@ -34,6 +35,7 @@ async def generate(request: Request, plex: PlexServer = Depends(require_auth)):
         playlist_key=form.get("playlist_key", ""),
     )
     return templates.TemplateResponse(
+        request,
         "partials/movie_cards.html",
         {"request": request, "movies": movies, "server_machine_id": plex.machineIdentifier},
     )

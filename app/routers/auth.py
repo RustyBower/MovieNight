@@ -81,7 +81,7 @@ async def login(request: Request):
 @router.get("/callback", response_class=HTMLResponse)
 async def callback(request: Request):
     """Plex redirects here after user approves; render polling page."""
-    return templates.TemplateResponse("login_waiting.html", {"request": request})
+    return templates.TemplateResponse(request, "login_waiting.html", {"request": request})
 
 
 @router.get("/poll")
@@ -165,6 +165,7 @@ async def servers(request: Request):
     current_is_custom = current_url and current_url not in all_uris
 
     return templates.TemplateResponse(
+        request,
         "partials/server_select.html",
         {
             "request": request,

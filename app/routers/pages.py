@@ -13,7 +13,7 @@ async def index(request: Request):
     session = request.state.session
     if session.get("plex_token") and session.get("server_url"):
         return RedirectResponse("/generate", status_code=302)
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html", {"request": request})
 
 
 @router.get("/generate", response_class=HTMLResponse)
@@ -21,4 +21,4 @@ async def generate_page(request: Request):
     session = request.state.session
     if not session.get("plex_token") or not session.get("server_url"):
         return RedirectResponse("/", status_code=302)
-    return templates.TemplateResponse("generate.html", {"request": request})
+    return templates.TemplateResponse(request, "generate.html", {"request": request})
