@@ -3,11 +3,13 @@
 import random
 import time
 
+from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
 from plexapi.video import Movie
 
 _filter_cache: dict[str, tuple[float, dict]] = {}  # keyed by server URL
 FILTER_CACHE_TTL = 300  # 5 minutes
+WATCHLIST_KEY = "watchlist"
 
 
 def get_movie_library(plex: PlexServer):
@@ -66,7 +68,10 @@ def get_random_movies(
     """Pick random movies matching filters."""
     if playlist_key:
         # Playlists can't use server-side search, fall back to client-side
-        movies = _get_playlist_movies(plex, playlist_key)
+        if playlist_key == WATCHLIST_KEY:
+            movies = _get_watchlist_movies(plex)
+        else:
+            movies = _get_playlist_movies(plex, playlist_key)
         filtered = _apply_filters(movies, genre, content_rating, decade, min_rating)
         count = min(count, len(filtered))
         if count == 0:
@@ -130,6 +135,20 @@ def _get_playlist_movies(plex: PlexServer, rating_key: str) -> list:
         if str(pl.ratingKey) == str(rating_key):
             return pl.items()
     return []
+
+
+def _get_watchlist_movies(plex: PlexServer) -> list:
+    """Movies on the user's plex.tv watchlist that exist in this library."""
+    lib = get_movie_library(plex)
+    if not lib:
+        return []
+    watchlist = MyPlexAccount(token=plex._token).watchlist(filter="released", libtype="movie")
+    guids = [w.guid for w in watchlist if w.guid]
+    movies: list = []
+    # Plex ORs comma-separated guid values; batch to keep the URL short
+    for i in range(0, len(guids), 20):
+        movies += lib.search(guid=guids[i : i + 20])
+    return movies
 
 
 def _movie_to_dict(m: Movie) -> dict:
