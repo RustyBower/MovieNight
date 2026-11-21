@@ -1,48 +1,19 @@
 {% if movies %}
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+{% set n = movies|length %}
+{% set compact = n >= 5 %}
+{% if n == 1 %}
+    {% set grid = "grid-cols-1 max-w-sm mx-auto gap-6" %}
+{% elif n == 2 %}
+    {% set grid = "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto gap-6" %}
+{% elif n <= 4 %}
+    {% set grid = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-" ~ n ~ " gap-6" %}
+{% else %}
+    {# 5 fits one row on desktop; 10 becomes two rows of 5 #}
+    {% set grid = "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4" %}
+{% endif %}
+<div class="grid {{ grid }} animate-fade-in">
     {% for m in movies %}
-    <a href="https://app.plex.tv/desktop#!/server/{{ server_machine_id }}/details?key=%2Flibrary%2Fmetadata%2F{{ m.rating_key }}"
-       target="_blank" rel="noopener"
-       class="movie-card group relative rounded-xl overflow-hidden bg-zinc-900
-              shadow-lg shadow-black/40 aspect-[2/3] block">
-        {% if m.has_thumb %}
-        <img src="/api/poster/{{ m.rating_key }}"
-             alt="{{ m.title }}"
-             loading="lazy"
-             class="w-full h-full object-cover">
-        {% else %}
-        <div class="w-full h-full flex items-center justify-center bg-zinc-800">
-            <span class="text-zinc-600 text-6xl font-bold">?</span>
-        </div>
-        {% endif %}
-
-        <!-- Hover overlay -->
-        <div class="movie-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent
-                    opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                    flex flex-col justify-end p-5">
-            <h3 class="text-xl font-bold text-white mb-1">{{ m.title }}</h3>
-            <div class="flex items-center gap-2 text-sm text-zinc-300 mb-2 flex-wrap">
-                {% if m.year %}<span>{{ m.year }}</span>{% endif %}
-                {% if m.content_rating %}
-                <span class="px-1.5 py-0.5 rounded bg-zinc-700 text-xs">{{ m.content_rating }}</span>
-                {% endif %}
-                {% if m.duration_minutes %}<span>{{ m.duration_minutes }} min</span>{% endif %}
-                {% if m.audience_rating %}
-                <span class="text-amber-400 font-semibold">{{ m.audience_rating }}</span>
-                {% endif %}
-            </div>
-            {% if m.genres %}
-            <div class="flex flex-wrap gap-1 mb-3">
-                {% for g in m.genres[:4] %}
-                <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs">{{ g }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-            {% if m.summary %}
-            <p class="text-xs text-zinc-400 line-clamp-4 leading-relaxed">{{ m.summary }}</p>
-            {% endif %}
-        </div>
-    </a>
+    {% include "partials/movie_card.html" %}
     {% endfor %}
 </div>
 {% else %}

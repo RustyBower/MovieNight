@@ -1,0 +1,71 @@
+{# Single movie card. Expects: m, server_machine_id, playlist_key, compact #}
+<div class="movie-card group relative rounded-xl overflow-hidden bg-zinc-900
+            shadow-lg shadow-black/40 aspect-[2/3] {% if m.watched %}is-watched{% endif %}">
+    <a href="https://app.plex.tv/desktop#!/server/{{ server_machine_id }}/details?key=%2Flibrary%2Fmetadata%2F{{ m.rating_key }}"
+       target="_blank" rel="noopener" class="block w-full h-full">
+        {% if m.has_thumb %}
+        <img src="/api/poster/{{ m.rating_key }}"
+             alt="{{ m.title }}"
+             loading="lazy"
+             class="w-full h-full object-cover">
+        {% else %}
+        <div class="w-full h-full flex items-center justify-center bg-zinc-800">
+            <span class="text-zinc-600 {% if compact %}text-4xl{% else %}text-6xl{% endif %} font-bold">?</span>
+        </div>
+        {% endif %}
+
+        <!-- Hover overlay -->
+        <div class="movie-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                    flex flex-col justify-end {% if compact %}p-3{% else %}p-5{% endif %}">
+            <h3 class="{% if compact %}text-sm{% else %}text-xl{% endif %} font-bold text-white mb-1">{{ m.title }}</h3>
+            <div class="flex items-center gap-2 {% if compact %}text-xs{% else %}text-sm{% endif %} text-zinc-300 mb-2 flex-wrap">
+                {% if m.year %}<span>{{ m.year }}</span>{% endif %}
+                {% if m.content_rating %}
+                <span class="px-1.5 py-0.5 rounded bg-zinc-700 text-xs">{{ m.content_rating }}</span>
+                {% endif %}
+                {% if m.duration_minutes %}<span>{{ m.duration_minutes }} min</span>{% endif %}
+                {% if m.audience_rating %}
+                <span class="text-amber-400 font-semibold">{{ m.audience_rating }}</span>
+                {% endif %}
+            </div>
+            {% if m.genres %}
+            <div class="flex flex-wrap gap-1 mb-2">
+                {% for g in m.genres[:(2 if compact else 4)] %}
+                <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs">{{ g }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if m.summary %}
+            <p class="text-xs text-zinc-400 {% if compact %}line-clamp-3{% else %}line-clamp-4{% endif %} leading-relaxed">{{ m.summary }}</p>
+            {% endif %}
+        </div>
+    </a>
+
+    <!-- Watched toggle (sibling of the link so clicks don't open Plex) -->
+    <div class="absolute top-2 right-2 z-10">
+        {% if m.watched %}
+        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500 text-zinc-950
+                     text-xs font-semibold shadow">
+            &#10003; Watched
+        </span>
+        {% else %}
+        <button type="button"
+                hx-post="/api/watched"
+                hx-vals='{"rating_key": "{{ m.rating_key }}", "playlist_key": "{{ playlist_key or "" }}", "compact": "{{ "1" if compact else "" }}"}'
+                hx-target="closest .movie-card"
+                hx-swap="outerHTML"
+                title="Mark watched in Plex{% if playlist_key %} and remove from this list{% endif %}"
+                class="watched-btn inline-flex items-center gap-1 px-2 py-1 rounded-full bg-black/70
+                       hover:bg-emerald-500 hover:text-zinc-950 text-zinc-200 text-xs font-semibold
+                       backdrop-blur transition-colors">
+            &#10003; Watched
+        </button>
+        {% endif %}
+    </div>
+    {% if m.watched_note %}
+    <div class="absolute top-10 right-2 left-2 z-10 text-right">
+        <span class="inline-block px-2 py-1 rounded bg-black/80 text-[11px] text-zinc-300">{{ m.watched_note }}</span>
+    </div>
+    {% endif %}
+</div>
