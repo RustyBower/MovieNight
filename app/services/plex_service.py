@@ -3,9 +3,11 @@
 import random
 import time
 
+from plexapi.exceptions import PlexApiException
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
 from plexapi.video import Movie
+from requests import RequestException
 
 _filter_cache: dict[str, tuple[float, dict]] = {}  # keyed by server URL
 FILTER_CACHE_TTL = 300  # 5 minutes
@@ -163,3 +165,37 @@ def _movie_to_dict(m: Movie) -> dict:
         "genres": [g.tag for g in m.genres],
         "has_thumb": bool(m.thumb),
     }
+
+
+def mark_watched(plex: PlexServer, rating_key: str, playlist_key: str = "") -> dict:
+    """Mark a movie played in Plex and drop it from the source list it came from.
+
+    Returns the movie dict flagged watched, with ``watched_note`` set when the
+    list removal could not happen (e.g. smart playlist).
+    """
+    movie = plex.fetchItem(int(rating_key))
+    movie.markPlayed()
+
+    note = ""
+    if playlist_key == WATCHLIST_KEY:
+        try:
+            MyPlexAccount(token=plex._token).removeFromWatchlist(movie)
+        except (PlexApiException, RequestException):
+            note = "Couldn't remove from watchlist"
+    elif playlist_key:
+        playlists = plex.playlists()
+        playlist = next((p for p in playlists if str(p.ratingKey) == playlist_key), None)
+        if playlist is None:
+            note = "Playlist not found"
+        elif playlist.smart:
+            note = "Smart playlist: not removed"
+        else:
+            try:
+                playlist.removeItems([movie])
+            except (PlexApiException, RequestException):
+                note = "Couldn't remove from playlist"
+
+    data = _movie_to_dict(movie)
+    data["watched"] = True
+    data["watched_note"] = note
+    return data

@@ -37,7 +37,34 @@ async def generate(request: Request, plex: PlexServer = Depends(require_auth)):
     return templates.TemplateResponse(
         request,
         "partials/movie_cards.html",
-        {"request": request, "movies": movies, "server_machine_id": plex.machineIdentifier},
+        {
+            "request": request,
+            "movies": movies,
+            "server_machine_id": plex.machineIdentifier,
+            "playlist_key": form.get("playlist_key", ""),
+        },
+    )
+
+
+@router.post("/watched", response_class=HTMLResponse)
+async def watched(request: Request, plex: PlexServer = Depends(require_auth)):
+    """Mark a movie watched and remove it from the source playlist/watchlist."""
+    form = await request.form()
+    movie = plex_service.mark_watched(
+        plex,
+        rating_key=str(form.get("rating_key", "")),
+        playlist_key=str(form.get("playlist_key", "")),
+    )
+    return templates.TemplateResponse(
+        request,
+        "partials/movie_card.html",
+        {
+            "request": request,
+            "m": movie,
+            "server_machine_id": plex.machineIdentifier,
+            "playlist_key": form.get("playlist_key", ""),
+            "compact": bool(form.get("compact")),
+        },
     )
 
 

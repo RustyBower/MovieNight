@@ -47,3 +47,16 @@
         opacity: 1 !important;
     }
 }
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Watched cards fade back so the remaining picks stand out */
+.movie-card.is-watched img {
+    filter: grayscale(0.8) brightness(0.55);
+    transition: filter 0.3s ease;
+}
